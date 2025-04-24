@@ -10,7 +10,13 @@ import { v2 as cloudinary } from "cloudinary";
 dotenv.config();
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+    files: 10, // Maximum 10 files
+  },
+});
 
 import RootRouterV1 from "./routes/index.js";
 
@@ -38,7 +44,7 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

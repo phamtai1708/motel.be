@@ -23,18 +23,18 @@ UserRouter.post(
 );
 UserRouter.post("/login", userMiddleware.login, userController.login);
 UserRouter.put(
-  "/update/:userName",
-  userMiddleware.updateUserName,
-  userController.updateUserName
+  "/update/:email",
+  userMiddleware.updateUserInfo,
+  userController.updateUserInfo
 );
-UserRouter.put(
-  "/update/avatar/:userId",
-  upload.single("avatar"),
-  userController.updateAvatar
-);
-UserRouter.delete(
-  "/delete/:userId",
-  userMiddleware.deleteUser,
-  userController.deleteUser
-);
+// UserRouter.put(
+//   "/update/avatar/:userId",
+//   upload.single("avatar"),
+//   userController.updateAvatar
+// );
+// UserRouter.delete(
+//   "/delete/:userId",
+//   userMiddleware.deleteUser,
+//   userController.deleteUser
+// );
 export default UserRouter;

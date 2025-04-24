@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   userName: {
     type: String,
-    default:"",
     minlength: 3
   },
   email: {
@@ -17,6 +16,7 @@ const userSchema = new mongoose.Schema({
   phone: { 
     type: String, 
     default: "",
+    unique: true,
     match: [/^[0-9]{10}$/, 'Please enter a valid phone number']
   },
   avatar: { 

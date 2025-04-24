@@ -1,15 +1,19 @@
 import mongoose from "mongoose";
 const roomSchema = new mongoose.Schema({
-  adress:{type:String, default:""},
+  address:{type:String, default:""},
   roomId:String,
-  landId:String,
-  userId:String,
+  landId:{type:String, default:""},
+  userId:{type:String, default:""},
   price:{type:String, default:""},
-  toilet:Number,
-  air:Number,
-  water:Number,
-  bed:Number,
-  wardrobe:Number,
+  toilet:{type:Number,default:0},
+  air:{type:Number,default:0},
+  water:{type:Number,default:0},
+  bed:{type:Number,default:0},
+  bedroom:{type:Number,default:0},
+  wardrobe:{type:Number,default:0},
+  vskk:{type:Boolean, default:true},
+  vsc:Number,
+  images:{type:Array, default:[]},
   description:{
     type:String,
     default:""

@@ -13,13 +13,34 @@ cloudinary.config(JSON.parse(process.env.CLOUDINARY_CONFIG));
 const RoomRouter = Router();
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+    files: 10, // Maximum 10 files
+  },
+});
 
 RoomRouter.get("", roomController.allRoom);
 RoomRouter.post(
-  "/registerRoom",
+  "/createRoom",
+  upload.array("images", 10),
   roomMiddleware.createRoom,
   roomController.createRoom
+);
+RoomRouter.delete(
+  "/deleteRoom/:roomId",
+  roomController.deleteRoom
+);
+RoomRouter.put(
+  "/updateRoomImage/:roomId",
+  upload.array("images", 10),
+  roomMiddleware.updateRoomImage,
+  roomController.updateRoomImage
+);
+RoomRouter.delete(
+  "/deleteRoomImage/:roomId",
+  roomController.deleteRoomImage
 );
 
 export default RoomRouter;

@@ -1,14 +1,16 @@
 import mongoose from "mongoose";
 const landSchema = new mongoose.Schema({
-  adress:{type:String, default:""},
+  address:{type:String, default:""},
   price:{type:String, default:""},
-  userId: String,
+  userId:{type:String, default:""},
   room:Number,
   toilet:Number,
   air:Number,
+  images:{type:Array,default:[]},
   water:Number,
   bed:Number,
   wardrobe:Number,
+  chdv:{type:Boolean, default:false}
 });
 const LandModel = mongoose.model("lands", landSchema);
 export default LandModel;

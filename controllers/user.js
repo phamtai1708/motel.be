@@ -2,7 +2,7 @@ import UserModel from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { SecretKey } from "../middlewares/token.js";
-import crypto from 'crypto';
+import crypto from "crypto";
 import dotenv from "dotenv";
 dotenv.config();
 import multer from "multer";
@@ -15,7 +15,7 @@ const upload = multer({ storage: storage });
 const userController = {
   allUser: async (req, res) => {
     try {
-      const allUsers = await UserModel.find().select('-password');
+      const allUsers = await UserModel.find().select("-password");
       res.status(200).send({
         message: "Success",
         data: allUsers,
@@ -30,35 +30,42 @@ const userController = {
 
   createUser: async (req, res) => {
     try {
-      const { userName, email, password } = req.body;
-      
-      // Check if user exists
-      const existingUser = await UserModel.findOne({ 
-        $or: [{ email }, { userName }] 
-      });
-      if (existingUser) {
-        throw new Error(existingUser.email === email ? 
-          "Email already exists" : "Username already exists");
-      }
+      const { userName, email, password, phoneNumber } = req.body;
 
       // Hash password
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
       // Create user
       const createdUser = await UserModel.create({
-        userName,
-        email,
+        userName:userName,
+        email:email,
         userId: crypto.randomUUID(),
         password: hashedPassword,
+        phone:phoneNumber,
+        address:"",
+        role: "member",
       });
+
+      // Generate JWT token
+      const token = jwt.sign(
+        {
+          userId: createdUser.userId,
+          email: createdUser.email,
+          role: createdUser.role,
+        },
+        SecretKey,
+        { expiresIn: "24h" }
+      );
 
       // Remove password from response
       const userResponse = createdUser.toObject();
       delete userResponse.password;
 
-      res.status(201).send({
+      res.status(200).send({
         message: "User created successfully",
         data: userResponse,
+        token,
       });
     } catch (error) {
       res.status(400).send({
@@ -71,7 +78,7 @@ const userController = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       // Find user
       const currentUser = await UserModel.findOne({ email });
       if (!currentUser) {
@@ -79,7 +86,10 @@ const userController = {
       }
 
       // Verify password
-      const comparedPassword = bcrypt.compareSync(password, currentUser.password);
+      const comparedPassword = bcrypt.compareSync(
+        password,
+        currentUser.password
+      );
       if (!comparedPassword) {
         throw new Error("Invalid email or password");
       }
@@ -88,15 +98,15 @@ const userController = {
       const user = {
         userId: currentUser.userId,
         email: currentUser.email,
-        role: currentUser.role
+        role: currentUser.role,
       };
 
       const accessToken = jwt.sign(user, SecretKey, {
-        expiresIn: '1h'
+        expiresIn: "1h",
       });
 
       const refreshToken = jwt.sign(user, SecretKey, {
-        expiresIn: '7d'
+        expiresIn: "7d",
       });
 
       // Remove password from response
@@ -107,7 +117,7 @@ const userController = {
         message: "Login successful",
         data: userResponse,
         accessToken,
-        refreshToken
+        refreshToken,
       });
     } catch (error) {
       res.status(401).send({
@@ -117,48 +127,57 @@ const userController = {
     }
   },
 
-  updateUserName: async (req, res) => {
+  updateUserInfo : async (req, res) => {
     try {
-      const { userName } = req.params;
-      const { userId } = req.body;
-
-      if (!userName.includes("=")) {
-        throw new Error("Invalid format for userName");
+      const updates = req.body; // Dữ liệu cần cập nhật từ body
+      const { email } = req.params; // Email của user cần cập nhật
+  
+      // 1. Kiểm tra người dùng có tồn tại không
+      const user = await UserModel.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "Không tồn tại người dùng" });
       }
-
-      const newName = userName.split("=")[1];
-      if (!userName.split("=")[0].includes("userName")) {
-        throw new Error("Invalid format for userName");
+  
+      // 2. Danh sách key hợp lệ từ schema
+      const validFields = Object.keys(UserModel.schema.paths);
+  
+      // 3. Kiểm tra xem tất cả các key trong updates có hợp lệ không
+      const allKeysValid = Object.keys(updates).every((key) => validFields.includes(key));
+      if (!allKeysValid) {
+        return res.status(400).json({ message: "Có trường không hợp lệ, không thể cập nhật" });
       }
-
-      // Check if new username already exists
-      const existingUser = await UserModel.findOne({ userName: newName });
-      if (existingUser) {
-        throw new Error("Username already exists");
+  
+      // 4. Kiểm tra định dạng số điện thoại
+      if (updates.phone) {
+        const phoneRegex = /^(0|\+84)[1-9]\d{8,9}$/;
+        if (!phoneRegex.test(updates.phone)) {
+          return res.status(400).json({ message: "Số điện thoại không hợp lệ" });
+        }
       }
-
+  
+      // 5. Kiểm tra dữ liệu có bị trùng với người dùng khác không
+      for (const [key, value] of Object.entries(updates)) {
+        if (["email", "phone", "userId"].includes(key)) {
+          const existingUser = await UserModel.findOne({ [key]: value, email: { $ne: email } });
+          if (existingUser) {
+            return res.status(400).json({ message: `Dữ liệu trùng lặp: ${key} đã tồn tại` });
+          }
+        }
+      }
+  
+      // 6. Cập nhật thông tin user
       const updatedUser = await UserModel.findOneAndUpdate(
-        { userId },
-        { userName: newName },
-        { new: true }
-      ).select('-password');
-
-      if (!updatedUser) {
-        return res.status(404).send({
-          message: "User not found",
-          data: null,
-        });
-      }
-
-      res.status(200).send({
-        message: "Username updated successfully",
+        { email }, // Điều kiện tìm kiếm
+        { $set: updates }, // Cập nhật dữ liệu hợp lệ
+        { new: true, select: "-password" } // Trả về user mới, bỏ password
+      );
+  
+      res.status(200).json({
+        message: "Cập nhật thông tin thành công",
         data: updatedUser,
       });
     } catch (error) {
-      res.status(400).send({
-        message: error.message,
-        data: null,
-      });
+      res.status(500).json({ message: error.message });
     }
   },
 
