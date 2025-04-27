@@ -1,5 +1,5 @@
 import UserModel from "../models/user.js";
-import bcrypt from "bcrypt";
+import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { SecretKey } from "../middlewares/token.js";
 import crypto from "crypto";
@@ -54,9 +54,8 @@ const userController = {
     try {
       const { userName, email, password, phoneNumber } = req.body;
 
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      // Hash password using argon2
+      const hashedPassword = await argon2.hash(password);
 
       // Create user
       const createdUser = await UserModel.create({
@@ -107,12 +106,9 @@ const userController = {
         throw new Error("Invalid email or password");
       }
 
-      // Verify password
-      const comparedPassword = bcrypt.compareSync(
-        password,
-        currentUser.password
-      );
-      if (!comparedPassword) {
+      // Verify password using argon2
+      const isValidPassword = await argon2.verify(currentUser.password, password);
+      if (!isValidPassword) {
         throw new Error("Invalid email or password");
       }
 

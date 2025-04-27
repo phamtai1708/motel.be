@@ -32,6 +32,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/v1", RootRouterV1);
 
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
 // Database connection
 mongoose
   .connect(process.env.MONGODB_URL)
