@@ -30,7 +30,51 @@ const landController = {
       });
     }
   },
+  findLand: async (req, res) => {
+    try {
+      const {value}= req.params;
+      console.log(value);
+      res.status(200).send({
+        message: "Success",
+        data: allLands,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message,
+        data: null,
+      });
+    }
+  },
+  renderLand: async (req, res) => {
+    try {
+      const {landId} = req.params;
+    
+      // Kiểm tra xem `landId` có hợp lệ không
+      if (!mongoose.Types.ObjectId.isValid(landId)) {
+        return res.status(400).json({
+          message: "Invalid landId format",
+          data: null,
+        });
+      }
 
+      const findLand = await LandModel.findById(landId);
+      if (!findLand) {
+        return res.status(404).json({
+          message: "Land not found",
+          data: null,
+        });
+      }
+      res.status(200).send({
+        message: "Success",
+        data: findLand,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message,
+        data: null,
+      });
+    }
+  },
   createLand: async (req, res) => {
     try {
       const {

@@ -27,6 +27,28 @@ const userController = {
       });
     }
   },
+  findUser: async (req, res) => {
+    try {
+      const {userId} = req.params;
+      const user = await UserModel.findOne({ userId: userId });
+
+      if (!user) {
+        return res.status(404).send({
+          message: "User not found",
+          data: null,
+        });
+      }
+      res.status(200).send({
+        message: "Success",
+        data: user,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message,
+        data: null,
+      });
+    }
+  },
 
   createUser: async (req, res) => {
     try {

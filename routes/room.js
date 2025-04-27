@@ -28,6 +28,10 @@ RoomRouter.post(
   roomMiddleware.createRoom,
   roomController.createRoom
 );
+RoomRouter.get(
+  "/:roomId",
+  roomController.renderRoom
+);
 RoomRouter.delete(
   "/deleteRoom/:roomId",
   roomController.deleteRoom

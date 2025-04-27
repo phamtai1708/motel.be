@@ -16,6 +16,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 UserRouter.get("", userController.allUser);
+UserRouter.get("/:userId",userController.findUser);
 UserRouter.post(
   "/register",
   userMiddleware.createUser,

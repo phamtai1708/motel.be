@@ -29,6 +29,37 @@ const roomController = {
       });
     }
   },
+  renderRoom: async (req, res) => {
+    try {
+      const {roomId} = req.params;
+    
+      // Kiểm tra xem `landId` có hợp lệ không
+      if (!mongoose.Types.ObjectId.isValid(roomId)) {
+        return res.status(400).json({
+          message: "Invalid roomId format",
+          data: null,
+        });
+      }
+
+      const findRoom = await RoomModel.findById(roomId);
+      if (!findRoom) {
+        return res.status(404).json({
+          message: "Room not found",
+          data: null,
+        });
+      }
+      res.status(200).send({
+        message: "Success",
+        data: findRoom,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message,
+        data: null,
+      });
+    }
+  },
+
 
   createRoom: async (req, res) => {
     try {

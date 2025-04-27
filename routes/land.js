@@ -23,6 +23,14 @@ const router = express.Router();
 
 
 router.get("/allLand", landController.allLand);
+router.get(
+  "/:landId",
+  landController.renderLand
+);
+router.get(
+  "/:value",
+  landController.findLand
+);
 router.post(
   "/createLand",
   upload.array("images", 10), // Accept up to 10 images
