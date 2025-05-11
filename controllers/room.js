@@ -1,5 +1,5 @@
 import RoomModel from "../models/room.js";
-import bcrypt from "bcrypt";
+import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { SecretKey } from "../middlewares/token.js";
 import crypto from "crypto";
@@ -59,6 +59,22 @@ const roomController = {
       });
     }
   },
+  findRoomOfUser: async (req, res) => {
+    try {
+      const {userId}= req.params;
+      console.log(userId);
+      const ListRoom = await RoomModel.find({ userId: userId });
+      res.status(200).send({
+        message: "Success",
+        data: ListRoom,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message,
+        data: null,
+      });
+    }
+  },  
 
 
   createRoom: async (req, res) => {

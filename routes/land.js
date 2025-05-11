@@ -31,6 +31,10 @@ router.get(
   "/:value",
   landController.findLand
 );
+router.get(
+  "/findLandOfUser/:userId",
+  landController.findLandOfUser
+);
 router.post(
   "/createLand",
   upload.array("images", 10), // Accept up to 10 images

@@ -3,7 +3,7 @@ import multer from "multer";
 const landMiddleware = {
   createLand: (req, res, next) => {
     try {
-      const { address, userId, price, room, toilet, air, water, bed, wardrobe} = req.body;
+      const { address, userId, price, room, toilet, air, water, bed,status, wardrobe,description} = req.body;
       
       const files = req.files; 
       console.log(req.files);
@@ -12,6 +12,8 @@ const landMiddleware = {
       if (!address) throw new Error("Address is required");
       if (!userId) throw new Error("User ID is required");
       if (!price) throw new Error("Price is required");
+      if (!status) throw new Error("Status is required");
+      if (!description) throw new Error("Description is required");
       if (!files || files.length === 0) throw new Error("Images is required");
 
       // Validate numeric fields

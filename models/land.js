@@ -10,7 +10,9 @@ const landSchema = new mongoose.Schema({
   water:Number,
   bed:Number,
   wardrobe:Number,
-  chdv:{type:Boolean, default:false}
+  chdv:{type:Boolean, default:false},
+  status: {type:String, default:"Còn trống"},
+  description:{type:String, default:""},
 });
 const LandModel = mongoose.model("lands", landSchema);
 export default LandModel;

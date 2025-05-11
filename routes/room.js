@@ -29,6 +29,10 @@ RoomRouter.post(
   roomController.createRoom
 );
 RoomRouter.get(
+  "/findRoomOfUser/:userId",
+  roomController.findRoomOfUser
+);
+RoomRouter.get(
   "/:roomId",
   roomController.renderRoom
 );

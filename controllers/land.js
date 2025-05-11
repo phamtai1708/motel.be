@@ -1,5 +1,5 @@
 import LandModel from "../models/land.js";
-import bcrypt from "bcrypt";
+import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { SecretKey } from "../middlewares/token.js";
 import crypto from "crypto";
@@ -30,6 +30,22 @@ const landController = {
       });
     }
   },
+  findLandOfUser: async (req, res) => {
+    try {
+      const {userId}= req.params;
+      console.log(userId);
+      const ListLand = await LandModel.find({ userId: userId });
+      res.status(200).send({
+        message: "Success",
+        data: ListLand,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message,
+        data: null,
+      });
+    }
+  },  
   findLand: async (req, res) => {
     try {
       const {value}= req.params;
@@ -79,6 +95,7 @@ const landController = {
     try {
       const {
         address,
+        status,
         userId,
         price,
         room,
@@ -88,6 +105,7 @@ const landController = {
         bed,
         wardrobe,
         chdv,
+        description
       } = req.body;
       const files = req.files; // Lấy danh sách file từ req.files
 
@@ -119,11 +137,13 @@ const landController = {
         room,
         toilet,
         air,
+        status,
         water,
         bed,
         wardrobe,
         chdv: chdv || false,
         images: imageUrls, // Lưu danh sách URL hình ảnh
+        description
       });
 
       res.status(201).send({

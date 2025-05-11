@@ -14,6 +14,7 @@ const roomSchema = new mongoose.Schema({
   vskk:{type:Boolean, default:true},
   vsc:Number,
   images:{type:Array, default:[]},
+  status: {type:String, default:"Còn trống"},
   description:{
     type:String,
     default:""
