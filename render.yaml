@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: motel-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js # hoặc server.js
+    envVars:
+      - key: MONGODB_URI
+        value: your-mongodb-connection-string
