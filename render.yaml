@@ -3,7 +3,12 @@ services:
     name: motel-backend
     env: node
     buildCommand: npm install
-    startCommand: node index.js # hoặc server.js
+    startCommand: node index.js
     envVars:
       - key: MONGODB_URI
         value: your-mongodb-connection-string
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
+    plan: free
