@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --watch index.js",
-    "start": "node index.js",
-    "postinstall": "sed -i 's/\\.\\/gOPD/\\.\\/gopd/' ./node_modules/gopd/index.js || true"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
